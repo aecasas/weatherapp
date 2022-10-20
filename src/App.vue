@@ -31,7 +31,10 @@ body{
 }
 
 #app{
-  background-image: url('./assests/cold-weather.png');
-
+  background-image: url('./assets/cold-weather.jpg');
+  background-size: cover;
+  background-position: bottom;
+  transition: 0.4s;
+  
 }
 </style>
