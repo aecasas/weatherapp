@@ -5,31 +5,31 @@
       <input type="text" 
       class="search-bar" 
       placeholder="Search..."
-      v-model="query"
-      @keypress="getWeather"
+      @click="getWeather"
+      
       />
     </div>
 
-        <div class="location-box">
-          <div class="location">{{ weather.name }}, {{  }}</div>
-        <div class="date">Today</div>
-      </div>
-    <div class="weather-box">
-      <div class="temp">weather.</div>
-        <div class="weather">{{weather.name}}</div>
-        <div class="coordinates">{{coordinates.lat}} Latitude, {{coordinates.lng}} Longitude</div></div>
-
-<p>please allow location services</p>
     <div class="weather-wrap" v-if="typeof weather.main != 'undefined'">
-    <p>Please allow location services</p>
-        <div class="location-box">
-          <div class="location">{{ weather.name }}, {{ weather.sys.country }}</div>
-        <div class="date">{{dateBuilder()}}</div>
+      <div class="weather-box">
+      <div class="banner">
+      <center><h2>Current Weather</h2></center>
       </div>
-    <div class="weather-box">
-      <div class="temp">{{ Math.round(weather.main.temp) }}°c </div>
-        <div class="weather">{{weather.weather[0].main}}</div>
-        <div class="coordinates">{{coordinates.lat}} Latitude, {{coordinates.lng}} Longitude</div>
+
+      <div class="location-box">
+        <div class="location">{{ weather.name }}, {{ weather.sys.country }}</div>
+      <div class="date">{{dateBuilder()}}</div>
+    </div>
+        <div class="temp">{{ Math.round(weather.main.temp) }}°c </div>
+          <div class="weather">{{weather.weather[0].main}} | {{weather.weather[0].description}} </div>
+    <div class="humidity"> Humidity: {{weather.main.humidity}} </div>
+    <div class="wind">{{weather.wind.speed}} M/S</div>
+    <div class="sunrise">Sunrise: {{weather.sys.sunrise}}</div>
+    <div class="sunset">Sunset: {{weather.sys.sunset}}</div>
+
+      
+    
+       
       <!-- Rounded switch -->
 
       <div class="slider-wrap">
@@ -42,7 +42,7 @@
 
     </div>
     </div>
-
+    
     </main>
     <myLocation></myLocation>
   </div>
@@ -51,7 +51,6 @@
 <script>
 
 import myLocation from './components/myLocation'
-
 
 
 export default {
@@ -80,6 +79,8 @@ export default {
       this.coordinates = coordinates
     })
     .catch(error => alert(error))
+  
+  
   },
   //testing pressing enter to fetch data
   methods: {
@@ -90,15 +91,17 @@ export default {
     this.$getLocation({})
     .then(coordinates => {
       this.coordinates = coordinates
+      console.log(coordinates)
     })
 
     
-    fetch(`${this.url_base}weather?lat=${this.coordinates.lat}&lon=${this.coordinates.lon}&units=metric&APPID=${this.api_key}`)
+    fetch(`${this.url_base}weather?lat=${this.coordinates.lat}&lon=${this.coordinates.lng}&units=metric&APPID=${this.api_key}`)
     
         .then(res => {
+          
+          console.log(res)
           return res.json();
         }).then(this.setResults);
-
 
 
     },
@@ -106,18 +109,6 @@ export default {
 
 
 
-/*     fetchWeather(e){
-      if (e.key == "Enter") {
-        //I need to be able to fetch the api using this: 
-        
-        //fetch(`${this.url_base}weather?lat=${this.coordinates.lat}&lon=${this.coordinates.lon}&units=metric&APPID=${this.api_key}`)
-        fetch(`${this.url_base}weather?q=${this.query}}&units=metric&APPID=${this.api_key}`)
-        .then(res => {
-          return res.json();
-        }).then(this.setResults);
-      }
-    },
- */
     setResults (results){
       this.weather = results;
     },
@@ -146,6 +137,12 @@ export default {
 
 body{
   font-family: 'monserrat', sans-serif;
+}
+
+.banner{
+  text-align: center;
+  color: #FFF;
+  font-size: 40px;
 }
 
 #app{
