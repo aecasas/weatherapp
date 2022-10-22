@@ -2,7 +2,7 @@
   <div id="app" :class="typeof weather.main != 'undefined' && weather.main.temp > 16 ? 'warm' : ''">
     <main>
     <div class="search-box">
-      <input type="text" 
+      <input type="button" 
       class="search-bar" 
       placeholder="Search..."
       @click="getWeather"
@@ -13,17 +13,17 @@
     <div class="weather-wrap" v-if="typeof weather.main != 'undefined'">
       <div class="weather-box">
       <div class="banner">
-      <center><h2>Current Weather</h2></center>
+      <div class="current-weather"><h2>Current Weather</h2></div>
       </div>
 
       <div class="location-box">
         <div class="location">{{ weather.name }}, {{ weather.sys.country }}</div>
       <div class="date">{{dateBuilder()}}</div>
     </div>
-    <div class="temp">{{ Math.round(weather.main.temp) }}°c </div>
+    <div class="temp">{{ Math.round(weather.main.temp) }} °{{indicator}} </div>
     <div class="weather">{{weather.weather[0].main}} | {{weather.weather[0].description}} </div>
     <div class="humidity"> Humidity: {{weather.main.humidity}} </div>
-    <div class="wind">{{weather.wind.speed}} M/S</div>
+    <div class="wind"> Wind: {{weather.wind.speed}} M/S</div>
     <div class="sunrise">Sunrise: {{weather.sys.sunrise}}</div>
     <div class="sunset">Sunset: {{weather.sys.sunset}}</div>
 
@@ -31,15 +31,14 @@
     
        
       <!-- Rounded switch -->
-
+      
       <div class="slider-wrap">
-<label class="switch"  @click="toggle">
-  <input type="checkbox">
+        
+<label class="switch"  >
+  <input id="converter" type="checkbox" @click="toggle">
   <span class="slider round"></span>
 </label>
 </div>
-
-
     </div>
     </div>
     
@@ -65,6 +64,17 @@ mounted(){
       console.log(coordinates)
     })
 
+    
+    fetch(`${this.url_base}weather?lat=${this.coordinates.lat}&lon=${this.coordinates.lon}&units=metric&APPID=${this.api_key}`)
+    
+    .then(res => {
+      
+      console.log(res)
+      
+      this.weather = res;
+      return res.json();
+    }).then(this.setResults);
+  
 
 },
 
@@ -75,35 +85,23 @@ mounted(){
       api_key: '8690c3d68f5af087d8daad88c04c4fcd',
       url_base: 'https://api.openweathermap.org/data/2.5/',
       query: '',
+      indicator: 'C',
       weather:{},
       coordinates:{
-        lat: 22,
-        lon: -66,
+        lat: 0,
+        lon: 0,
       }
     }
   },
   //fetch geolocation
   created(){
 
+
     this.$getLocation({})
     .then(coordinates => {
       this.coordinates = coordinates
+      console.log(coordinates)
     })
-    .catch(error => alert(error))
-
-  
-    setTimeout(() => {  console.log(this.coordinates); }, 5000);
-    
-     
-    fetch(`${this.url_base}weather?lat=${this.coordinates.lat}&lon=${this.coordinates.lon}&units=metric&APPID=${this.api_key}`)
-    
-    .then(res => {
-      
-      console.log(res)
-      
-      this.weather = res;
-      return res.json();
-    }).then(this.setResults);
 
   },
 
@@ -114,10 +112,20 @@ mounted(){
 
 
      toggle(){
+     
+      if (document.getElementById('converter').checked) {
+          this.weather.main.temp =  this.weather.main.temp * 1.8 + 32
+          this.indicator = "F"
+          console.log(this.weather.main.temp + " F")
+
+
+      return (this.weather.main.temp,this.indicator)
+        } else {
+          this.weather.main.temp = (this.weather.main.temp - 32) * 5 / 9
+          this.indicator = "C"
+          console.log(this.weather.main.temp + " C")
+        }
       
-      console.log(this.weather.main.temp * 1.8 + 32)
-      this.weather.main.temp = this.weather.main.temp * 1.8 + 32
-      return (this.weather.main.temp)
     },
 
     getWeather(){
@@ -280,6 +288,7 @@ main {
   display: inline-block;
   width: 60px;
   height: 34px;
+
 }
 
 /* Hide default HTML checkbox */
@@ -336,5 +345,49 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.slider-wrap{
+  padding-top:50px;
+}
+
+
+.humidity{
+  
+  color:#FFF;
+  font-size: 30px;
+  font-weight: 700;
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.wind{
+  
+  color:#FFF;
+  font-size: 30px;
+  font-weight: 700;
+
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.sunrise{
+  
+  color:#FFF;
+  font-size: 30px;
+  font-weight: 700;
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.sunset{
+  
+  color:#FFF;
+  font-size: 30px;
+  font-weight: 700;
+  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.current-weather{
+  text-align: center;
+
+}
+
 
 </style>
