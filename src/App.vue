@@ -20,8 +20,8 @@
         <div class="location">{{ weather.name }}, {{ weather.sys.country }}</div>
       <div class="date">{{dateBuilder()}}</div>
     </div>
-        <div class="temp">{{ Math.round(weather.main.temp) }}°c </div>
-          <div class="weather">{{weather.weather[0].main}} | {{weather.weather[0].description}} </div>
+    <div class="temp">{{ Math.round(weather.main.temp) }}°c </div>
+    <div class="weather">{{weather.weather[0].main}} | {{weather.weather[0].description}} </div>
     <div class="humidity"> Humidity: {{weather.main.humidity}} </div>
     <div class="wind">{{weather.wind.speed}} M/S</div>
     <div class="sunrise">Sunrise: {{weather.sys.sunrise}}</div>
@@ -33,7 +33,7 @@
       <!-- Rounded switch -->
 
       <div class="slider-wrap">
-<label class="switch">
+<label class="switch"  @click="toggle">
   <input type="checkbox">
   <span class="slider round"></span>
 </label>
@@ -44,20 +44,31 @@
     </div>
     
     </main>
-    <myLocation></myLocation>
   </div>
 </template>
 
 <script>
 
-import myLocation from './components/myLocation'
 
 
 export default {
   name: 'App',
   components: {
-    myLocation
+   
   },
+mounted(){
+
+  
+    this.$getLocation({})
+    .then(coordinates => {
+      this.coordinates = coordinates
+      console.log(coordinates)
+    })
+
+
+},
+
+
   //weather api 
   data (){
     return {
@@ -66,8 +77,8 @@ export default {
       query: '',
       weather:{},
       coordinates:{
-        lat: 0,
-        long: 0
+        lat: 22,
+        lon: -66,
       }
     }
   },
@@ -79,11 +90,35 @@ export default {
       this.coordinates = coordinates
     })
     .catch(error => alert(error))
+
   
-  
+    setTimeout(() => {  console.log(this.coordinates); }, 5000);
+    
+     
+    fetch(`${this.url_base}weather?lat=${this.coordinates.lat}&lon=${this.coordinates.lon}&units=metric&APPID=${this.api_key}`)
+    
+    .then(res => {
+      
+      console.log(res)
+      
+      this.weather = res;
+      return res.json();
+    }).then(this.setResults);
+
   },
+
   //testing pressing enter to fetch data
+
+
   methods: {
+
+
+     toggle(){
+      
+      console.log(this.weather.main.temp * 1.8 + 32)
+      this.weather.main.temp = this.weather.main.temp * 1.8 + 32
+      return (this.weather.main.temp)
+    },
 
     getWeather(){
 
@@ -97,11 +132,11 @@ export default {
     
     fetch(`${this.url_base}weather?lat=${this.coordinates.lat}&lon=${this.coordinates.lng}&units=metric&APPID=${this.api_key}`)
     
-        .then(res => {
-          
-          console.log(res)
-          return res.json();
-        }).then(this.setResults);
+    .then(res => {
+      
+      console.log(res)
+      return res.json();
+    }).then(this.setResults);
 
 
     },
@@ -111,7 +146,12 @@ export default {
 
     setResults (results){
       this.weather = results;
+      console.log(this.results)
     },
+
+
+
+
     dateBuilder () {
       let d = new Date();
       let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
