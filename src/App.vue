@@ -1,12 +1,13 @@
 <template>
+  
   <div id="app" :class="typeof weather.main != 'undefined' && weather.main.temp > 16 ? 'warm' : ''">
     <main>
-    <div class="search-box">
+    
+      <div class="search-box">
       <input type="button" 
       class="search-bar" 
       placeholder="Search..."
       @click="getWeather"
-      
       />
     </div>
 
@@ -15,30 +16,57 @@
       <div class="banner">
       <div class="current-weather"><h2>Current Weather</h2></div>
       </div>
-
       <div class="location-box">
         <div class="location">{{ weather.name }}, {{ weather.sys.country }}</div>
       <div class="date">{{dateBuilder()}}</div>
     </div>
     <div class="temp">{{ Math.round(weather.main.temp) }} °{{indicator}} </div>
     <div class="weather">{{weather.weather[0].main}} | {{weather.weather[0].description}} </div>
-    <div class="humidity"> Humidity: {{weather.main.humidity}} </div>
-    <div class="wind"> Wind: {{weather.wind.speed}} M/S</div>
-    <div class="sunrise">Sunrise: {{weather.sys.sunrise}}</div>
-    <div class="sunset">Sunset: {{weather.sys.sunset}}</div>
 
-      
-    
-       
+
       <!-- Rounded switch -->
       
-      <div class="slider-wrap">
-        
-<label class="switch"  >
-  <input id="converter" type="checkbox" @click="toggle">
-  <span class="slider round"></span>
-</label>
+      <div class="slider-wrap">        
+        <label class="switch"  >
+          <input id="converter" type="checkbox" @click="toggle">
+          <span class="slider round"></span>
+        </label>
+        </div>
+
+
+<!-- Separate Divs for details-->
+<div class="weather-details">
+<div id='parent_div_1'>
+  <div class ='child_div_2'>Humidity</div>
+  <div class ='child_div_2'>Wind</div>
+  <div class ='child_div_2'>sunrise        </div>
+  <div class ='child_div_2'>sunset</div>
+  </div>
+
+  <div id='parent_div_2'>
+  <div class ='child_div_2'>
+    <div class="humidity">{{weather.main.humidity}} </div>
+  </div>
+
+  <div class ='child_div_2'>
+    <div class="wind"> {{weather.wind.speed}} M/S</div>
+  </div>
+
+
+  <div class ='child_div_2'>
+    <div class="sunrise">{{weather.sys.sunrise}}</div>
+  </div>
+
+  <div class ='child_div_2'>
+    <div class="sunset">{{weather.sys.sunset}}</div>
+  </div>
+
+
+  </div>
 </div>
+    
+
+      
     </div>
     </div>
     
@@ -47,13 +75,11 @@
 </template>
 
 <script>
-
-
+import "@/assets/style.css";
 
 export default {
   name: 'App',
   components: {
-   
   },
 mounted(){
 
@@ -74,8 +100,8 @@ mounted(){
       this.weather = res;
       return res.json();
     }).then(this.setResults);
-  
-
+    
+    
 },
 
 
@@ -110,7 +136,6 @@ mounted(){
 
   methods: {
 
-
      toggle(){
      
       if (document.getElementById('converter').checked) {
@@ -143,18 +168,33 @@ mounted(){
     .then(res => {
       
       console.log(res)
+      
       return res.json();
     }).then(this.setResults);
 
-
+    this.weather.sys.sunrise = new Date(this.weather.sys.sunrise*1000)
+    console.log(this.weather.sys.sunrise)
+    this.weather.sys.sunset = new Date(this.weather.sys.sunset*1000)
+    console.log(this.weather.sys.sunset)
+    return this.weather.sys.sunrise,this.weather.sys.sunset
     },
 
 
 
 
     setResults (results){
-      this.weather = results;
-      console.log(this.results)
+    this.weather = results;
+    console.log(this.results)
+
+    //Sunrise Sunset conversion
+    
+    this.weather.sys.sunrise = new Date(this.weather.sys.sunrise*1000).toLocaleTimeString();
+    console.log(this.weather.sys.sunrise)
+
+    this.weather.sys.sunset = new Date(this.weather.sys.sunset*1000).toLocaleTimeString();
+    console.log(this.weather.sys.sunset)
+
+    return this.weather.sys.sunrise,this.weather.sys.sunset
     },
 
 
@@ -169,225 +209,17 @@ mounted(){
       let month = months[d.getMonth()];
       let year = d.getFullYear();
       return `${day} ${date} ${month} ${year}`;
-    }
+    },
+
+
+  
 
   }
 
 }
 </script>
-
+@import './style.css';
 <style>
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body{
-  font-family: 'monserrat', sans-serif;
-}
-
-.banner{
-  text-align: center;
-  color: #FFF;
-  font-size: 40px;
-}
-
-#app{
-  background-image: url('./assets/cold-weather.jpg');
-  background-size: cover;
-  background-position: bottom;
-  transition: 0.4s;
-  
-}
-
-#app.warm{
-  background-image: url('./assets/warm-weather.jpg');
-}
-
-main {
-  min-height: 100vh;
-  padding: 25px;
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.75));
-}
-.search-box {
-  width: 100%;
-  margin-bottom: 30px;
-}
-.search-box .search-bar {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  
-  color: #313131;
-  font-size: 20px;
-  appearance: none;
-  border:none;
-  outline: none;
-  background: none;
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 0px 16px 0px 16px;
-  transition: 0.4s;
-}
-.search-box .search-bar:focus {
-  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.25);
-  background-color: rgba(255, 255, 255, 0.75);
-  border-radius: 16px 0px 16px 0px;
-}
-
-.location-box .location{
-  color:#FFFF;
-  font-size: 32px;
-  font-weight: 500;
-  text-align: center;
-  text-shadow: 1px 3px rgba(0, 0, 0, 0.25);
-}
-
-
-.location-box .date{
-  color:#FFF;
-  font-size: 20px;
-  font-weight: 300;
-  font-style: italic;
-  text-align: center;
-}
-
-.weather-box{
-  text-align: center;
-
-}
-
-.weather-box .temp{
-  display: inline-block;
-  padding: 10px 25px;
-  color:#FFFF;
-  font-size: 102px;
-  font-weight: 900;
-
-  text-shadow: 3px 6px rgba(255,255,255,0.25);
-  background-color: rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
-  margin: 30px 0px;
-
-
-  box-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
-
-
-.weather-box .weather{
-  color:#FFF;
-  font-size: 48px;
-  font-weight: 700;
-  font-style: italic;
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
-/* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-
-}
-
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-.slider-wrap{
-  padding-top:50px;
-}
-
-
-.humidity{
-  
-  color:#FFF;
-  font-size: 30px;
-  font-weight: 700;
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
-
-.wind{
-  
-  color:#FFF;
-  font-size: 30px;
-  font-weight: 700;
-
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
-
-.sunrise{
-  
-  color:#FFF;
-  font-size: 30px;
-  font-weight: 700;
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
-
-.sunset{
-  
-  color:#FFF;
-  font-size: 30px;
-  font-weight: 700;
-  text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
-}
-
-.current-weather{
-  text-align: center;
-
-}
 
 
 </style>
